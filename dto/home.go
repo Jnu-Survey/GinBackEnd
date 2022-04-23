@@ -1,7 +1,11 @@
 package dto
 
 type HomeOutput struct {
-	BackgroundColor string `json:"backgroundColor" form:"backgroundColor" comment:"backgroundColor"` // backgroundColor
-	Title           string `json:"title" form:"title" comment:"title"`                               // title
-	Img             string `json:"img" form:"img" comment:"img"`                                     // img
+	Jump string `json:"jump" form:"jump" comment:"jump"` // jump
+	Img  string `json:"img" form:"img" comment:"img"`    // img
+}
+
+type HomePartOutput struct {
+	Swapping []HomeOutput `json:"swapping" form:"swapping" comment:"swapping"` // swapping
+	Button   []HomeOutput `json:"button" form:"button" comment:"button"`       // button
 }

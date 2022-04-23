@@ -9,6 +9,8 @@ import (
 	en_translations "gopkg.in/go-playground/validator.v9/translations/en"
 	zh_translations "gopkg.in/go-playground/validator.v9/translations/zh"
 	"reflect"
+	"regexp"
+	"strings"
 	"wechatGin/public"
 )
 
@@ -43,18 +45,19 @@ func TranslationMiddleware() gin.HandlerFunc {
 				return fld.Tag.Get("comment")
 			})
 
-			//自定义验证方法
-			//https://github.com/go-playground/validator/blob/v9/_examples/custom-validation/main.go
-			val.RegisterValidation("is-validuser", func(fl validator.FieldLevel) bool {
-				return fl.Field().String() == "admin"
+			// 自定义验证方法
+			// 验证邮箱
+			val.RegisterValidation("validaEmail", func(fl validator.FieldLevel) bool {
+				matched, _ := regexp.Match(`[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+`, []byte(strings.ToUpper(fl.Field().String())))
+				return matched
 			})
 
-			//自定义验证器
-			//https://github.com/go-playground/validator/blob/v9/_examples/translations/main.go
-			val.RegisterTranslation("is-validuser", trans, func(ut ut.Translator) error {
-				return ut.Add("is-validuser", "{0} 填写不正确哦", true)
+			// 自定义验证器
+			// 验证邮箱是否符合要求
+			val.RegisterTranslation("validaEmail", trans, func(ut ut.Translator) error {
+				return ut.Add("validaEmail", "{0} 格式不正确", true)
 			}, func(ut ut.Translator, fe validator.FieldError) string {
-				t, _ := ut.T("is-validuser", fe.Field())
+				t, _ := ut.T("validaEmail", fe.Field())
 				return t
 			})
 			break

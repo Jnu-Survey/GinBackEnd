@@ -2,8 +2,8 @@ package common
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
-	"github.com/e421083458/golang_common/lib"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -30,10 +30,10 @@ func NewMongoDbPool() (*MongoDb, error) {
 }
 
 func ConnectToDB() (*mongo.Collection, error) {
-	url := lib.GetStringConf("mongo_map.list.data_source")
-	name := lib.GetStringConf("mongo_map.list.name")
-	collection := lib.GetStringConf("mongo_map.list.collection")
-	maxCollection := lib.GetIntConf("mongo_map.list.max_collection")
+	url := MongoDataSource
+	name := MongoName
+	collection := MongoCollection
+	maxCollection := MongoMaxCollection
 	var timeout time.Duration = 10 // 设置10秒的超时时间
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -72,4 +72,51 @@ func (m *MongoDb) InsertToDb(wantStr string) (string, error) {
 		return "", errors.New("断言错误")
 	}
 	return id.Hex(), nil
+}
+
+func (m *MongoDb) FindInfoByField(field, want string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	filter := bson.M{field: want}
+	cursor, err := m.connection.Find(ctx, filter)
+	if err != nil {
+		return "", err
+	}
+	defer cursor.Close(ctx)
+	var temp []bson.M
+	if err = cursor.All(context.Background(), &temp); err != nil {
+		return "", err
+	}
+	if len(temp) == 0 {
+		return "", nil
+	}
+	jsonInfo, err := json.Marshal(temp)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonInfo), nil
+}
+
+func (m *MongoDb) FindInfoById(id string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	objID, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{"_id": objID}
+	cursor, err := m.connection.Find(ctx, filter)
+	if err != nil {
+		return "", err
+	}
+	defer cursor.Close(ctx)
+	var temp []bson.M
+	if err = cursor.All(context.Background(), &temp); err != nil {
+		return "", err
+	}
+	if len(temp) == 0 {
+		return "", nil
+	}
+	jsonInfo, err := json.Marshal(temp[0])
+	if err != nil {
+		return "", err
+	}
+	return string(jsonInfo), nil
 }

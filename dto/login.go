@@ -8,7 +8,7 @@ import (
 // ------------------ 登陆 ------------------
 
 type LoginInput struct {
-	Code      string `json:"code" form:"code" comment:"临时登录凭证code" example:"" validate:"required"`     // 临时登录凭证code
+	Code      string `json:"code" form:"code" comment:"登录凭证code" example:"" validate:"required"`       // 登录凭证code
 	AvatarUrl string `json:"avatarUrl" form:"avatarUrl" comment:"头像地址" example:"" validate:"required"` // 头像地址
 	City      string `json:"city" form:"city" comment:"城市" example:"" validate:""`                     // 城市
 	Country   string `json:"country" form:"country" comment:"国家" example:"" validate:""`               // 国家
@@ -24,4 +24,12 @@ func (params *LoginInput) BindValidParam(c *gin.Context) error {
 type LoginOutput struct {
 	Token string `json:"token" form:"token" comment:"token"` // token
 	Msg   string `json:"msg" form:"msg" comment:"msg"`       // msg
+}
+
+type LoginTempInput struct {
+	TempCode string `json:"temp_code" form:"temp_code" comment:"临时登录凭证code" example:"" validate:"required"` // 临时登录凭证code
+}
+
+func (params *LoginTempInput) BindValidParam(c *gin.Context) error {
+	return public.DefaultGetValidParams(c, params)
 }

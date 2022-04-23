@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 	"wechatGin/common"
+	"wechatGin/middleware"
 )
 
 var (
@@ -15,7 +16,7 @@ var (
 )
 
 func HttpServerRun() {
-	// todo 初始化连接池
+	// todo 初始化mongo连接池
 	mongoPool, err := common.NewMongoDbPool()
 	if err != nil {
 		log.Println(err)
@@ -25,7 +26,10 @@ func HttpServerRun() {
 
 	// todo HTTP服务启动
 	gin.SetMode(lib.ConfBase.DebugMode)
-	r := InitRouter()
+	r := InitRouter(
+		middleware.FlowLimiterMiddleware(),
+		middleware.NginxLogMiddleware(),
+	)
 	HttpSrvHandler = &http.Server{
 		Addr:           lib.GetStringConf("base.http.addr"),
 		Handler:        r,

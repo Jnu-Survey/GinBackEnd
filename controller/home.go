@@ -16,79 +16,60 @@ type HomeController struct {
 
 func HomeRegister(group *gin.RouterGroup) {
 	homeController := &HomeController{}
-	group.GET("/swiperItem", homeController.SwiperItem)
-	group.GET("/buttonTitle", homeController.ButtonTitle)
+	group.GET("/swiperItem", homeController.SwiperItem) // 获取轮播图信息
 }
 
-// SwiperItem godoc
-// @Summary 获取轮播图信息
-// @Description 获取轮播图信息
-// @Tags 首页
-// @ID /home/swiperItem
-// @Accept  json
-// @Produce  json
-// @Success 200 {object} middleware.Response{data=[]dto.HomeOutput} "success"
-// @Router /home/swiperItem [get]
 func (home *HomeController) SwiperItem(c *gin.Context) {
-	// 因为是首页的话那么不需要Get携带参数
 	// todo 先去缓存中查找如果没有再去数据库查找然后打上缓存（有效去为1天吧）
 	cache, err := services.GetHomeCache("home")
 	if err != nil {
-		middleware.ResponseError(c, 2001, errors.New("服务器错误")) // 2001 缓存出问题了
+		middleware.ResponseError(c, 2001, errors.New("服务器错误"))
 		return
 	}
 	var res []dao.Home
-	if cache == "" { // 如果不存在的话
+	var flag = true
+	if cache != "" {
+		err = json.Unmarshal([]byte(cache), &res)
+		if err != nil {
+			flag = false
+		}
+	}
+	if cache == "" || !flag { // 如果不存在的话
 		tx, err := lib.GetGormPool("default")
 		if err != nil {
-			middleware.ResponseError(c, 10000, errors.New("服务器错误")) // 10000 池子不通畅
+			middleware.ResponseError(c, 10000, errors.New("服务器错误"))
 			return
 		}
 		var homeTemp *dao.Home
 		res, err = homeTemp.GetAllInfo(c, tx)
 		if err != nil {
-			middleware.ResponseError(c, 2002, errors.New("查询数据库错误")) // 2002 要么错误/要么没有
+			middleware.ResponseError(c, 2002, errors.New("查询数据库错误"))
 			return
 		}
 		toJson, err := json.Marshal(res)
 		if err != nil {
-			middleware.ResponseError(c, 2003, errors.New("服务器错误")) // 2003 序列化错误
+			middleware.ResponseError(c, 2003, errors.New("服务器错误"))
 			return
 		}
-		err = services.MakeHomeCache("home", string(toJson))
-		if err != nil {
-			middleware.ResponseError(c, 2004, errors.New("服务器错误")) // 2004 缓存打不上了
-			return
-		}
-	} else {
-		err = json.Unmarshal([]byte(cache), &res)
-		if err != nil {
-			middleware.ResponseError(c, 2005, errors.New("服务器错误")) // 2004 缓存打不上了
-			return
-		}
+		services.MakeHomeCache("home", string(toJson))
 	}
 	// todo 组装返回的
-	var resList []dto.HomeOutput
-	for _, v := range res {
+	var swapping []dto.HomeOutput
+	var button []dto.HomeOutput
+	for k, _ := range res {
 		temp := dto.HomeOutput{
-			BackgroundColor: v.Color,
-			Title:           v.Title,
-			Img:             v.Img,
+			Jump: res[k].Jump,
+			Img:  res[k].Img,
 		}
-		resList = append(resList, temp)
+		if k < len(res)-2 { // 这个是轮播图
+			swapping = append(swapping, temp)
+		} else {
+			button = append(button, temp)
+		}
 	}
-	middleware.ResponseSuccess(c, resList)
-}
-
-// ButtonTitle godoc
-// @Summary 按钮文字
-// @Description 按钮文字
-// @Tags 首页
-// @ID /home/buttonTitle
-// @Accept  json
-// @Produce  json
-// @Success 200 {object} middleware.Response{data=string} "success"
-// @Router /home/buttonTitle [get]
-func (home *HomeController) ButtonTitle(c *gin.Context) {
-	middleware.ResponseSuccess(c, "快速开始 创建表单")
+	final := dto.HomePartOutput{
+		Swapping: swapping,
+		Button:   button,
+	}
+	middleware.ResponseSuccess(c, final)
 }

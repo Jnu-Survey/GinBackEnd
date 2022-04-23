@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"golang.org/x/crypto/md4"
 	"math/big"
+	"net/url"
 	"os"
 )
 
@@ -85,11 +86,11 @@ func Base64UrlEncoding(input []byte) string {
 }
 
 func Base64UrlDecoding(encodeUrl string) string {
-	uDec, err := base64.URLEncoding.DecodeString(encodeUrl)
+	decodedValue, err := url.QueryUnescape(encodeUrl)
 	if err != nil {
 		return ""
 	}
-	return string(uDec)
+	return decodedValue
 }
 
 //  ----------------------- BASE58 -----------------------

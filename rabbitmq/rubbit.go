@@ -8,7 +8,7 @@ import (
 	"os"
 	"sync"
 	"time"
-	"wechatGin/public"
+	"wechatGin/common"
 )
 
 type SyncWriter struct {
@@ -34,7 +34,7 @@ type RabbitMQ struct {
 
 // NewRabbitMQ 创建结构体实例
 func NewRabbitMQ(queueName string, exchange string, key string) *RabbitMQ {
-	return &RabbitMQ{QueueName: queueName, Exchange: exchange, Key: key, Mqurl: public.RabbitMQURL}
+	return &RabbitMQ{QueueName: queueName, Exchange: exchange, Key: key, Mqurl: common.RabbitMQURL}
 }
 
 // Destroy 断开 channel 和 connection

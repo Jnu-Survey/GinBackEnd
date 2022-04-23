@@ -11,9 +11,8 @@ type Home struct {
 	Id        int       `json:"id" gorm:"primary_key" description:"自增主键"`
 	CreatedAt time.Time `json:"created_at" gorm:"column:created_at" description:"创建时间"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"column:updated_at" description:"更新时间"`
-	Color     string    `json:"color" gorm:"column:color" description:"颜色"`
+	Jump      string    `json:"jump" gorm:"column:jump" description:"跳转链接"`
 	Img       string    `json:"img" gorm:"column:img" description:"图片链接"`
-	Title     string    `json:"title" gorm:"column:title" description:"标题"`
 }
 
 func (h *Home) TableName() string {

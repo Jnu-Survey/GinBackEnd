@@ -1,7 +1,7 @@
 # This is base config
 
 [base]
-    debug_mode="debug"
+    debug_mode="release"
     time_location="Asia/Chongqing"
 
 [http]
@@ -25,9 +25,3 @@
     [log.console_writer]        #工作台输出
         on = false
         color = false
-
-[swagger]
-    title="swagger API"
-    desc="This is a sample server celler server."
-    host="127.0.0.1:8880"
-    base_path=""

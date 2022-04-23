@@ -5,19 +5,8 @@ const (
 	TranslatorKey    = "TranslatorKey"
 	RedisFlowDayKey  = "flow_day_count"
 	RedisFlowHourKey = "flow_hour_count"
+	FlowTotal        = "flow_total" // 全站
+	FlowCountLimit   = 2000         // 限制qps
+	CreatingNum      = 10           // 每个用户正在创建的数量
+	SplitSymbol      = "%_%"        // 切割信息字符串
 )
-
-const (
-	Appid  = "" // 小程序 appId
-	Secret = "" // 小程序 appSecret
-)
-
-// ----------- 密钥 -----------
-
-const (
-	TempTokenKey = ""
-	RabbitDsn    = "root:root@tcp(127.0.0.1:3306)/jnuwechat?charset=utf8&parseTime=true&loc=Asia%2FChongqing"
-	RabbitMQURL  = "amqp://admin:admin@127.0.0.1:5672/"
-)
-
-var TempTokenIv = []byte{}

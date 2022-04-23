@@ -5,15 +5,3 @@
         max_active = 100
         max_idle = 100
         down_grade = false
-
-[slave_1]
-    proxy_list = ["127.0.0.1:6380"]
-    max_active = 100
-    max_idle = 100
-    down_grade = false
-
-[slave_2]
-    proxy_list = ["127.0.0.1:6381"]
-    max_active = 100
-    max_idle = 100
-    down_grade = false
