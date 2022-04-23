@@ -1,0 +1,349 @@
+definitions:
+  dto.FormDoneDetail:
+    properties:
+      ban:
+        type: integer
+      create:
+        type: string
+      delete:
+        type: integer
+      fromId:
+        type: string
+      tips:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.FormDoneInfo:
+    properties:
+      info:
+        description: info
+        items:
+          $ref: '#/definitions/dto.FormDoneDetail'
+        type: array
+      msg:
+        description: msg
+        type: string
+      status:
+        description: info
+        type: integer
+      total:
+        description: total
+        type: integer
+    type: object
+  dto.FormRegisteredInput:
+    properties:
+      token:
+        description: 通行证
+        example: ""
+        type: string
+    required:
+    - token
+    type: object
+  dto.FormUpdateInput:
+    properties:
+      form:
+        description: 表单json序列化后放入该字段
+        example: ""
+        type: string
+      order:
+        description: 表单随机分配的ID
+        example: ""
+        type: string
+      token:
+        description: 通行证
+        example: ""
+        type: string
+    required:
+    - form
+    - order
+    - token
+    type: object
+  dto.FormUpdateOutput:
+    properties:
+      msg:
+        description: msg
+        type: string
+      update_time:
+        description: update_time
+        type: string
+    type: object
+  dto.HomeOutput:
+    properties:
+      backgroundColor:
+        description: backgroundColor
+        type: string
+      img:
+        description: img
+        type: string
+      title:
+        description: title
+        type: string
+    type: object
+  dto.LoginInput:
+    properties:
+      avatarUrl:
+        description: 头像地址
+        example: ""
+        type: string
+      city:
+        description: 城市
+        example: ""
+        type: string
+      code:
+        description: 临时登录凭证code
+        example: ""
+        type: string
+      country:
+        description: 国家
+        example: ""
+        type: string
+      gender:
+        description: 性别
+        example: 0
+        type: integer
+      nickName:
+        description: 微信用户
+        example: ""
+        type: string
+      province:
+        description: 省会
+        example: ""
+        type: string
+    required:
+    - avatarUrl
+    - code
+    - nickName
+    type: object
+  dto.LoginOutput:
+    properties:
+      msg:
+        description: msg
+        type: string
+      token:
+        description: token
+        type: string
+    type: object
+  middleware.Response:
+    properties:
+      data: {}
+      errmsg:
+        type: string
+      errno:
+        type: integer
+      stack: {}
+      trace_id: {}
+    type: object
+info:
+  contact: {}
+paths:
+  /form/formDoing:
+    get:
+      consumes:
+      - application/json
+      description: 获取我正在填写的表单
+      operationId: /form/formDoing
+      parameters:
+      - description: 通行证
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 获取我正在填写的表单
+      tags:
+      - 业务
+  /form/formDone:
+    post:
+      consumes:
+      - application/json
+      description: 完成表单提交
+      operationId: /form/formDone
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.FormUpdateInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 完成表单提交
+      tags:
+      - 业务
+  /form/formOutDone:
+    get:
+      consumes:
+      - application/json
+      description: 获取我发出的订单已经填写好了的
+      operationId: /form/formOutDone
+      parameters:
+      - description: 通行证
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.FormDoneInfo'
+              type: object
+      summary: 获取我发出的订单已经填写好了的
+      tags:
+      - 业务
+  /form/getFormId:
+    get:
+      consumes:
+      - application/json
+      description: 获取创建订单ID编号
+      operationId: /form/getFormId
+      parameters:
+      - description: 通行证
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.FormRegisteredInput'
+              type: object
+      summary: 获取创建订单ID编号
+      tags:
+      - 业务
+  /form/tempUpdate:
+    post:
+      consumes:
+      - application/json
+      description: 更新记录缓存
+      operationId: /form/tempUpdate
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.FormUpdateInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.FormUpdateOutput'
+              type: object
+      summary: 更新记录缓存
+      tags:
+      - 业务
+  /home/buttonTitle:
+    get:
+      consumes:
+      - application/json
+      description: 按钮文字
+      operationId: /home/buttonTitle
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 按钮文字
+      tags:
+      - 首页
+  /home/swiperItem:
+    get:
+      consumes:
+      - application/json
+      description: 获取轮播图信息
+      operationId: /home/swiperItem
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.HomeOutput'
+                  type: array
+              type: object
+      summary: 获取轮播图信息
+      tags:
+      - 首页
+  /login/dealLogin:
+    post:
+      consumes:
+      - application/json
+      description: 拿到通行证
+      operationId: /login/dealLogin
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.LoginOutput'
+              type: object
+      summary: 拿到通行证
+      tags:
+      - 登陆
+swagger: "2.0"

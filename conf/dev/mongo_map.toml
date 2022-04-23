@@ -1,0 +1,6 @@
+[list]
+    driver_name = "mongo"
+    data_source = "mongodb://admin123:admin123@localhost:27017/?authSource=wechat"
+    name = "wechat"
+    collection = "info"
+    max_collection = 10
