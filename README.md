@@ -1,3 +1,12 @@
+##  项目介绍
+项目总体介绍：https://github.com/Jnu-Survey/Introduce
+
+状态吗返回文档：https://github.com/Jnu-Survey/Introduce/blob/main/code.md
+
+APIfox在线文档地址：https://www.apifox.cn/apidoc/shared-1a5c59a5-a923-47a7-8dac-a03c3e7b7577
+
+![概念图](https://raw.githubusercontent.com/Jnu-Survey/Introduce/main/assets/poster.png)
+
 ##  后端介绍
 
 > 后端项目开发负责人：[HengY1Sky](https://github.com/HengY1Sky/)
@@ -33,7 +42,7 @@ location ^~ /
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-   	proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
 }
 
@@ -51,7 +60,7 @@ conf里面的连接命令是根据docker编排的账号密码进行设置的
 
 *如果你不使用Docker编排，那么你需要自己安装`Mysql`;`Redis`;`MongoDB`;`RabbitMQ`;
 
-然后在`conf`文件中与`common/secret.go`修改连接命令即可。
+然后在`conf`文件中与`common/secret.go`修改连接命令并使用`init.sql`手动初始化数据库即可。
 
 > **具体版本可以参考`docker-compose`中的版本来进行安装**
 

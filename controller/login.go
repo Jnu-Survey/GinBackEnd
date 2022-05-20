@@ -19,8 +19,8 @@ type LoginController struct {
 
 func LoginRegister(group *gin.RouterGroup) {
 	loginController := &LoginController{}
-	group.POST("/dealLogin", loginController.GetToken)     // 拿到通行证
-	group.POST("/testLogin", loginController.GetTempToken) // 拿到临时通行证
+	group.POST("/dealLogin", loginController.GetToken) // 拿到通行证
+	//group.POST("/testLogin", loginController.GetTempToken) // 拿到临时通行证(用于压力测试)
 }
 
 func (login *LoginController) GetToken(c *gin.Context) {
