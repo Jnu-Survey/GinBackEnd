@@ -73,8 +73,8 @@ func (person *PersonController) GetPersonalSwapping(c *gin.Context) {
 		middleware.ResponseError(c, 4002, errors.New("服务器错误"))
 		return
 	}
-	if len(info) > 6 { // 如果超过了6份
-		info = info[:6] // 因为是个人中心没必要这么多
+	if len(info) > 4 { // 如果超过了4份
+		info = info[:4] // 因为是个人中心没必要这么多
 	}
 	if len(info) == 0 {
 		middleware.ResponseSuccess(c, "") // 没有就直接返回空
@@ -200,7 +200,7 @@ func packageInfo(cacheInfo []dao.Form) []dto.DoingOutput {
 		temp.Id = cacheInfo[k].RandomId
 		temp.Title = cacheInfo[k].FormInfos.Title
 		temp.Tip = cacheInfo[k].FormInfos.Tip
-		temp.Time = cacheInfo[k].FormInfos.UpdatedAt.Format("2006-01-02 15:04")
+		temp.Time = cacheInfo[k].UpdatedAt.Format("2006-01-02 15:04")
 		res = append(res, temp)
 	}
 	return res
