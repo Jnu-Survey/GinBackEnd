@@ -2,10 +2,11 @@ package dao
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type Form struct {
@@ -91,6 +92,7 @@ func (f *Form) GetAllDoneInfo(c *gin.Context, tx *gorm.DB, uid string, pageIndex
 		Where("status = ?", 1).
 		//Where("is_delete = ?", 0).              // 没有删除
 		Limit(10).Offset(10 * (pageIndex - 1)). // 实现分页查询
+		Order("id desc").
 		Find(&more)
 	err := res.Error
 	if res.RowsAffected == 0 { // 不存在
@@ -114,6 +116,7 @@ func (f *Form) GetAllDoing(c *gin.Context, tx *gorm.DB, uid string) ([]Form, err
 		Where("uid = ?", uid).
 		Where("status = ?", 0).    // 正在填写
 		Where("is_delete = ?", 0). // 没有删除
+		Order("id desc").          // 倒序
 		Find(&forms)
 	err := result.Error
 	if err != nil {

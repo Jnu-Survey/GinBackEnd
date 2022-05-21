@@ -1,11 +1,12 @@
 package dao
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
-	"strconv"
-	"time"
 )
 
 type Commit struct {
@@ -105,7 +106,8 @@ func (co *Commit) GetAllDoingOrDone(c *gin.Context, tx *gorm.DB, fromUid string,
 	var commitInfos []Commit
 	result := tx.WithContext(c).Table(co.TableName()).
 		Where("from_uid = ?", fromUid).
-		Where("status = ?", status).            // 已经填写好了的
+		Where("status = ?", status). // 已经填写好了的
+		Order("id desc").
 		Limit(10).Offset(10 * (pageIndex - 1)). // 实现分页查询
 		Find(&commitInfos)
 	err := result.Error
@@ -137,7 +139,8 @@ func (co *Commit) GetAllFillFormForMe(c *gin.Context, tx *gorm.DB, toUid string,
 	var commitInfos []Commit
 	result := tx.WithContext(c).Table(co.TableName()).
 		Where("to_uid = ?", toUid).
-		Where("status = ?", 1).                 // 已经填写好了的
+		Where("status = ?", 1). // 已经填写好了的
+		Order("id desc").
 		Limit(10).Offset(10 * (pageIndex - 1)). // 实现分页查询
 		Find(&commitInfos)
 	err := result.Error
