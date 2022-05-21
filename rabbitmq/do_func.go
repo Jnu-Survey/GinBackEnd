@@ -2,15 +2,17 @@ package rabbitmq
 
 import (
 	"errors"
-	"github.com/bitly/go-simplejson"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"strconv"
 	"strings"
 	"time"
 	"wechatGin/common"
 	"wechatGin/dao"
 	"wechatGin/public"
+
+	"github.com/bitly/go-simplejson"
+	"github.com/e421083458/golang_common/log"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 type DealFunc func(msg string) error
@@ -39,8 +41,7 @@ func makeDealFuncList() []DealFunc {
 		}()
 		msgList := strings.Split(msg, public.SplitSymbol)
 		uid, orderId := msgList[0], msgList[1]
-		dsn := common.RabbitDsn // 与配置中相通
-		tx, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		tx, err := RabbitPoolInUsing.GetDB()
 		if err != nil {
 			return
 		}
@@ -67,8 +68,7 @@ func makeDealFuncList() []DealFunc {
 		}()
 		msgList := strings.Split(msg, public.SplitSymbol)
 		uid, orderId, nickName, json := msgList[0], msgList[1], msgList[2], msgList[3]
-		dsn := common.RabbitDsn // 与配置中相通
-		tx, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		tx, err := RabbitPoolInUsing.GetDB()
 		if err != nil {
 			return
 		}
@@ -88,8 +88,7 @@ func makeDealFuncList() []DealFunc {
 		}()
 		msgList := strings.Split(msg, public.SplitSymbol)
 		from, to, order := msgList[0], msgList[1], msgList[2]
-		dsn := common.RabbitDsn // 与配置中相通
-		tx, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		tx, err := RabbitPoolInUsing.GetDB()
 		if err != nil {
 			return
 		}
@@ -209,4 +208,48 @@ func HandleJsonInfo(jsonStr, order, nickName, fromUid string) (string, error) {
 		return "", err
 	}
 	return string(marshalJSON), nil
+}
+
+var RabbitPoolInUsing RabbitSQLPool
+
+type RabbitSQLPool struct {
+	dbConn *gorm.DB
+}
+
+func init() {
+	pool, err := NewMysqlConnection()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	RabbitPoolInUsing = pool
+}
+
+func NewMysqlConnection() (RabbitSQLPool, error) {
+	var res RabbitSQLPool
+	conn, err := gorm.Open(mysql.Open(common.RabbitDsn), &gorm.Config{})
+	if err != nil {
+		return res, err
+	}
+	sqlDB, err := conn.DB()
+	if err != nil {
+		return res, err
+	}
+	sqlDB.SetMaxIdleConns(common.RabbitMysqlConsumeNum)     // 设置空闲连接池中连接的最大数量
+	sqlDB.SetMaxOpenConns(5 * common.RabbitMysqlConsumeNum) // 设置打开数据库连接的最大数量
+	sqlDB.SetConnMaxLifetime(time.Second * 100)
+	res.dbConn = conn
+	return res, nil
+}
+
+// GetDB 开放给外部获得db连接
+func (r *RabbitSQLPool) GetDB() (*gorm.DB, error) {
+	sqlDB, err := r.dbConn.DB()
+	if err != nil {
+		return nil, err
+	}
+	if err = sqlDB.Ping(); err != nil {
+		sqlDB.Close()
+		return nil, err
+	}
+	return r.dbConn, nil
 }

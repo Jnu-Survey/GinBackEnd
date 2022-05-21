@@ -1,8 +1,9 @@
 package dto
 
 import (
-	"github.com/gin-gonic/gin"
 	"wechatGin/public"
+
+	"github.com/gin-gonic/gin"
 )
 
 // ------------------ 登陆 ------------------
@@ -27,7 +28,7 @@ type LoginOutput struct {
 }
 
 type LoginTempInput struct {
-	TempCode string `json:"temp_code" form:"temp_code" comment:"临时登录凭证code" example:"" validate:"required"` // 临时登录凭证code
+	TempCode string `json:"temp_code" form:"temp_code" comment:"临时登录凭证temp_code" example:"" validate:"required"` // 临时登录凭证temp_code
 }
 
 func (params *LoginTempInput) BindValidParam(c *gin.Context) error {
