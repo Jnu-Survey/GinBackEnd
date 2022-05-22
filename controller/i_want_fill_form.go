@@ -2,9 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"github.com/garyburd/redigo/redis"
-	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 	"strconv"
 	"time"
 	"wechatGin/common"
@@ -13,6 +10,10 @@ import (
 	"wechatGin/middleware"
 	"wechatGin/public"
 	"wechatGin/services"
+
+	"github.com/garyburd/redigo/redis"
+	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 )
 
 type OrderController struct {
@@ -208,7 +209,7 @@ func (order *OrderController) CommitDone(c *gin.Context) {
 		middleware.ResponseError(c, 5013, errors.New("服务器错误"))
 		return
 	}
-	common.WebsocketService.PushInfo(base.uid, str)
+	common.WebsocketService.PushInfo(strconv.Itoa(orderInfo.Uid), str)
 	middleware.ResponseSuccess(c, "记录成功")
 }
 

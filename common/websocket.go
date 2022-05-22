@@ -1,11 +1,12 @@
 package common
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 // 定义websocket升级
@@ -141,8 +142,7 @@ func (w *WebSocket) WsHandler(writer http.ResponseWriter, r *http.Request, id st
 					return
 				}
 			case <-pingTicker.C: // 服务端心跳
-				conn.SetWriteDeadline(time.Now().Add(time.Second * 7))
-				err = conn.WriteMessage(websocket.PingMessage, []byte{})
+				err = conn.WriteJSON("")
 				if err != nil {
 					conn.Close()
 					w.DeleteClientAndChannel(id)
